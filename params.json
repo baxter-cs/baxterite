@@ -1,6 +1,6 @@
 {
   "name": "Baxterite",
   "tagline": "A course audit web application for Baxter Academy",
-  "body": "### Welcome to Baxterite\r\nBaxterite is an innovative and ethical web application that provides a new method of course audit for Baxter Academy.\r\n\r\n### Features\r\n- Program of studies catalog \r\n- Graduation standards including benchmark requirements\r\n- Class registration and recommendations based on preferences\r\n- Checklist of classes taken and standards achieved ",
+  "body": "![Baxterite](https://cloud.githubusercontent.com/assets/14347683/15797354/950a8924-29e2-11e6-91df-4673fa3d27ee.png)\r\n### Welcome to Baxterite\r\nBaxterite is an innovative and ethical web application that provides a new method of course audit for Baxter Academy.\r\n\r\n### Features\r\n- Program of studies catalog \r\n- Graduation standards including benchmark requirements\r\n- Class registration and recommendations based on preferences\r\n- Checklist of classes taken and standards achieved ",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
