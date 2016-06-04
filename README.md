@@ -1,5 +1,7 @@
+<img src="https://cloud.githubusercontent.com/assets/14347683/15797416/662dca14-29e5-11e6-97aa-495285cbcd47.png" align="right" />
 # Baxterite
 A course audit web application for Baxter Academy  
+> Innovative and Ethical  
 
 ## Features
 - Program of studies catalog 
