@@ -56,22 +56,27 @@ def current_class_name_id(class_id):
     return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
 
 
+def current_class_name(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
+
+
 def new_classname(class_id, active, name):
     session.add(ClassName(class_id=class_id, active=active, name=name))
     session.commit()
 
 
-def new_instance(class_id, className_id, block, start_trimester, end_trimester, year):
-    session.add(Instance(class_id=class_id, className_id=className_id, block=block, start_trimester=start_trimester, end_trimester=end_trimester, year=year))
+def new_instance(class_id, class_name_id, block, start_trimester, end_trimester, year):
+    session.add(Instance(class_id=class_id, className_id=class_name_id, block=block,
+                         start_trimester=start_trimester, end_trimester=end_trimester, year=year))
     session.commit()
     instance_id = session.query(Instance).filter(Instance.class_id == class_id).\
-        filter(Instance.className_id == className_id).\
+        filter(Instance.className_id == class_name_id).\
         filter(Instance.year == year).\
         filter(Instance.block == block).\
         filter(Instance.end_trimester == end_trimester).\
         filter(Instance.start_trimester == start_trimester).\
         first().__id__
-    # Add standards to instance
+    # Inherits standards to instance
     for standard in session.query(ClassStandard).filter(ClassStandard.class_id == class_id).all():
         new_instance_standard(standard.__id__, instance_id)
     return instance_id
@@ -85,3 +90,22 @@ def new_class_standard(standard_id, class_id):
 def new_instance_standard(standard_id, instance_id):
     session.add(InstanceStandard(standard_id=standard_id, instance_id=instance_id))
     session.commit()
+
+
+def dict_of_classes():
+    response = {
+        'classes': []
+    }
+    for __class__ in session.query(Class).all():
+        response['classes'].append(dict_of_class_info(__class__.__id__))
+    return response
+
+
+def dict_of_class_info(class_id):
+    __class__ = session.query(Class).filter(Class.__id__ == class_id).first()
+    class_info = {
+        'name': current_class_name(class_id),
+        'id': class_id,
+        'desc': __class__.class_desc
+    }
+    return class_info
