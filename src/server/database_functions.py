@@ -46,8 +46,25 @@ def new_class(name, desc):
     created_classname = session.query(ClassName).filter(ClassName.class_id == created_class.__id__).first()
     created_class.current_name = created_classname.__id__
     session.commit()
+    return created_class.__id__
+
+
+def current_class_name_id(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
 
 
 def new_classname(class_id, active, name):
     session.add(ClassName(class_id=class_id, active=active, name=name))
     session.commit()
+
+
+def new_instance(class_id, className_id, block, start_trimester, end_trimester, year):
+    session.add(Instance(class_id=class_id, className_id=className_id, block=block, start_trimester=start_trimester, end_trimester=end_trimester, year=year))
+    session.commit()
+    return session.query(Instance).filter(Instance.class_id == class_id).\
+        filter(Instance.className_id == className_id).\
+        filter(Instance.year == year).\
+        filter(Instance.block == block).\
+        filter(Instance.end_trimester == end_trimester).\
+        filter(Instance.start_trimester == start_trimester).\
+        first().__id__
