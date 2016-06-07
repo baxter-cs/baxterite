@@ -50,6 +50,13 @@ class InstanceStandard(Base):
     instance_id = Column(Integer, nullable=False)
 
 
+class ClassStandard(Base):
+    __tablename__ = 'ClassStandard'
+    __id__ = Column(Integer, primary_key=True)
+    standard_id = Column(Integer, nullable=False)
+    class_id = Column(Integer, nullable=False)
+
+
 class ClassTaken(Base):
     __tablename__ = 'ClassTaken'
     __id__ = Column(Integer, primary_key=True)

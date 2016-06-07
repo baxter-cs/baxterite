@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Standard, Class, ClassName, Instance, InstanceStandard, ClassTaken, Student, ClassStandardGrade, Base
+from database_setup import Standard, Class, ClassName, Instance, InstanceStandard
+from database_setup import ClassTaken, Student, ClassStandardGrade, Base, ClassStandard
 
 from helper_functions import *
 
@@ -25,6 +26,7 @@ def wipe_tables():
     session.query(ClassTaken).delete()
     session.query(Student).delete()
     session.query(ClassStandardGrade).delete()
+    session.query(ClassStandard).delete()
     session.commit()
 
 
@@ -36,6 +38,7 @@ def new_student(student_id, avatar, active, tokens):
 def new_standard(name, desc):
     session.add(Standard(standard_name=name, standard_desc=desc))
     session.commit()
+    return session.query(Standard).filter(Standard.standard_name == name).filter(Standard.standard_desc == desc).first().__id__
 
 
 def new_class(name, desc):
@@ -61,10 +64,24 @@ def new_classname(class_id, active, name):
 def new_instance(class_id, className_id, block, start_trimester, end_trimester, year):
     session.add(Instance(class_id=class_id, className_id=className_id, block=block, start_trimester=start_trimester, end_trimester=end_trimester, year=year))
     session.commit()
-    return session.query(Instance).filter(Instance.class_id == class_id).\
+    instance_id = session.query(Instance).filter(Instance.class_id == class_id).\
         filter(Instance.className_id == className_id).\
         filter(Instance.year == year).\
         filter(Instance.block == block).\
         filter(Instance.end_trimester == end_trimester).\
         filter(Instance.start_trimester == start_trimester).\
         first().__id__
+    # Add standards to instance
+    for standard in session.query(ClassStandard).filter(ClassStandard.class_id == class_id).all():
+        new_instance_standard(standard.__id__, instance_id)
+    return instance_id
+
+
+def new_class_standard(standard_id, class_id):
+    session.add(ClassStandard(standard_id=standard_id, class_id=class_id))
+    session.commit()
+
+
+def new_instance_standard(standard_id, instance_id):
+    session.add(InstanceStandard(standard_id=standard_id, instance_id=instance_id))
+    session.commit()
