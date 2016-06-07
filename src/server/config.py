@@ -1,0 +1,1 @@
+path_to_database = 'sqlite:////home/jcharante/Projects/Baxterite/baxterite/src/server/database.db'
