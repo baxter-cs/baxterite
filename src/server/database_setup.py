@@ -11,14 +11,14 @@ Base = declarative_base()
 
 class Standard(Base):
     __tablename__ = 'Standard'
-    standard_id = Column(Integer, primary_key=True)
+    __id__ = Column(Integer, primary_key=True)
     standard_name = Column(String(), nullable=False)
     standard_desc = Column(String(), nullable=False)
 
 
 class Class(Base):
     __tablename__ = 'Class'
-    class_id = Column(Integer, primary_key=True)
+    __id__ = Column(Integer, primary_key=True)
     current_name = Column(Integer(), nullable=False)
     class_desc = Column(String(), nullable=False)
 
@@ -26,16 +26,16 @@ class Class(Base):
 # We have to have a table to keep track of class names because people can't stop renaming classes.
 class ClassName(Base):
     __tablename__ = 'ClassName'
-    className_id = Column(Integer, primary_key=True)
+    __id__ = Column(Integer, primary_key=True)
     class_id = Column(Integer, nullable=False)
     active = Column(Boolean, nullable=False)
     name = Column(String(), nullable=False)
 
-# Couldn't come up for a bett
-er name for a class session.
+
+# Couldn't come up for a better name for a class session.
 class Instance(Base):
     __tablename__ = 'Instance'
-    instance_id = Column(Integer, primary_key=True)
+    __id__ = Column(Integer, primary_key=True)
     class_id = Column(Integer, nullable=False)
     className_id = Column(Integer, nullable=False)
     block = Column(String(), nullable=False)
@@ -44,24 +44,37 @@ class Instance(Base):
     year = Column(Integer, nullable=False)  # The start of the school year (2015 for 2015-2016 school year
 
 
-class InstanceMember(Base):
-    __tablename__ = 'InstanceMember'
-    instance_member_id = Column(Integer, primary_key=True)
+class InstanceStandard(Base):
+    __tablename__ = 'InstanceStandard'
+    __id__ = Column(Integer, primary_key=True)
+    standard_id = Column(Integer, nullable=False)
+    instance_id = Column(Integer, nullable=False)
+
+
+class ClassTaken(Base):
+    __tablename__ = 'ClassTaken'
+    __id__ = Column(Integer, primary_key=True)
     instance_id = Column(Integer, nullable=False)  # The id of the instance
     student_id = Column(Integer, nullable=False)
 
 
 class Student(Base):
     __tablename__ = 'Student'
-    student_id = Column(Integer, primary_key=True)
-    email = Column(String(), nullable=False, unique=True)
-    name = Column(String(), nullable=True)
+    __id__ = Column(Integer, primary_key=True)
+    student_id = Column(Integer)  # The user id obtained from google oauth
     avatar = Column(String())
     active = Column(Boolean, default=False)
     tokens = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.utcnow())
 
 
+# Table connecting the grades a student got for a standard in a class.
+class ClassStandardGrade(Base):
+    __tablename__ = 'ClassStandardGrade'
+    __id__ = Column(Integer, primary_key=True)
+    student_id = Column(Integer)
+    class_taken_id = Column(Integer)
+    grade = Column(String())
 
 
 # Create an engine that stores data in the local directory's
