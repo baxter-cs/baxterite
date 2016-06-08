@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database_setup import Standard, Class, ClassName, Instance, InstanceStandard
-from database_setup import ClassTaken, InstanceMember, ClassStandardGrade, Base, ClassStandard
+from database_setup import ClassTaken, InstanceMember, InstanceStandardGrade, Base, ClassStandard
 
 from helper_functions import *
 
@@ -25,7 +25,7 @@ def wipe_tables():
     session.query(InstanceStandard).delete()
     session.query(ClassTaken).delete()
     session.query(InstanceMember).delete()
-    session.query(ClassStandardGrade).delete()
+    session.query(InstanceStandardGrade).delete()
     session.query(ClassStandard).delete()
     session.commit()
 
@@ -36,13 +36,15 @@ def wipe_tables():
 
 
 def new_standard(name, desc):
-    session.add(Standard(standard_name=name, standard_desc=desc))
+    session.add(Standard(standard_name=name,
+                         standard_desc=desc))
     session.commit()
     return session.query(Standard).filter(Standard.standard_name == name).filter(Standard.standard_desc == desc).first().__id__
 
 
 def new_class(name, desc):
-    session.add(Class(current_name=999999, class_desc=desc))
+    session.add(Class(current_name=999999,
+                      class_desc=desc))
     session.commit()
     created_class = session.query(Class).filter(Class.current_name == 999999).first()
     new_classname(created_class.__id__, True, name)
@@ -53,13 +55,19 @@ def new_class(name, desc):
 
 
 def new_classname(class_id, active, name):
-    session.add(ClassName(class_id=class_id, active=active, name=name))
+    session.add(ClassName(class_id=class_id,
+                          active=active,
+                          name=name))
     session.commit()
 
 
 def new_instance(class_id, class_name_id, block, start_trimester, end_trimester, year):
-    session.add(Instance(class_id=class_id, className_id=class_name_id, block=block,
-                         start_trimester=start_trimester, end_trimester=end_trimester, year=year))
+    session.add(Instance(class_id=class_id,
+                         className_id=class_name_id,
+                         block=block,
+                         start_trimester=start_trimester,
+                         end_trimester=end_trimester,
+                         year=year))
     session.commit()
     instance_id = session.query(Instance).filter(Instance.class_id == class_id).\
         filter(Instance.className_id == class_name_id).\
@@ -75,17 +83,28 @@ def new_instance(class_id, class_name_id, block, start_trimester, end_trimester,
 
 
 def new_class_standard(standard_id, class_id):
-    session.add(ClassStandard(standard_id=standard_id, class_id=class_id))
+    session.add(ClassStandard(standard_id=standard_id,
+                              class_id=class_id))
     session.commit()
 
 
 def new_instance_standard(standard_id, instance_id):
-    session.add(InstanceStandard(standard_id=standard_id, instance_id=instance_id))
+    session.add(InstanceStandard(standard_id=standard_id,
+                                 instance_id=instance_id))
     session.commit()
 
 
 def new_instance_member(instance_id, student_id):
-    session.add(InstanceMember(instance_id=instance_id, student_id=student_id))
+    session.add(InstanceMember(instance_id=instance_id,
+                               student_id=student_id))
+    session.commit()
+
+
+def instance_standard_grade(student_id, standard_id, instance_id, grade):
+    session.add(InstanceStandardGrade(student_id=student_id,
+                                      standard_id=standard_id,
+                                      instance_id=instance_id,
+                                      grade=grade))
     session.commit()
 
 

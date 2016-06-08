@@ -65,11 +65,12 @@ class ClassTaken(Base):
 
 
 # Table connecting the grades a student got for a standard in a class.
-class ClassStandardGrade(Base):
-    __tablename__ = 'ClassStandardGrade'
+class InstanceStandardGrade(Base):
+    __tablename__ = 'InstanceStandardGrade'
     __id__ = Column(Integer, primary_key=True)
-    student_id = Column(Integer)
-    class_taken_id = Column(Integer)
+    student_id = Column(Integer, nullable=False)
+    standard_id = Column(Integer, nullable=False)
+    instance_id = Column(Integer, nullable=False)
     grade = Column(String())
 
 
