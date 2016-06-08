@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database_setup import Standard, Class, ClassName, Instance, InstanceStandard
-from database_setup import ClassTaken, Student, ClassStandardGrade, Base, ClassStandard
+from database_setup import ClassTaken, InstanceMember, ClassStandardGrade, Base, ClassStandard
 
 from helper_functions import *
 
@@ -24,15 +24,15 @@ def wipe_tables():
     session.query(Instance).delete()
     session.query(InstanceStandard).delete()
     session.query(ClassTaken).delete()
-    session.query(Student).delete()
+    session.query(InstanceMember).delete()
     session.query(ClassStandardGrade).delete()
     session.query(ClassStandard).delete()
     session.commit()
 
 
-def new_student(student_id, avatar, active, tokens):
-    session.add(Student(student_id=student_id, avatar=avatar, active=active, tokens=tokens))
-    session.commit()
+###############################
+#  Object Creation Functions  #
+###############################
 
 
 def new_standard(name, desc):
@@ -50,18 +50,6 @@ def new_class(name, desc):
     created_class.current_name = created_classname.__id__
     session.commit()
     return created_class.__id__
-
-
-def current_class_name_id(class_id):
-    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
-
-
-def current_class_name(class_id):
-    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
-
-
-def get_name_from_class_name_id(class_name_id):
-    return session.query(ClassName).filter(ClassName.__id__ == class_name_id).first().name
 
 
 def new_classname(class_id, active, name):
@@ -95,6 +83,15 @@ def new_instance_standard(standard_id, instance_id):
     session.add(InstanceStandard(standard_id=standard_id, instance_id=instance_id))
     session.commit()
 
+
+def new_instance_member(instance_id, student_id):
+    session.add(InstanceMember(instance_id=instance_id, student_id=student_id))
+    session.commit()
+
+
+###############################
+#  Get Information Functions  #
+###############################
 
 def dict_of_classes():
     response = {
@@ -135,4 +132,25 @@ def dict_of_class_instances(class_id):
     }
     for __instance__ in session.query(Instance).filter(Instance.class_id == class_id).all():
         response['instances'].append(dict_of_instance_info(__instance__.__id__))
+    return response
+
+
+def current_class_name_id(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
+
+
+def current_class_name(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
+
+
+def get_name_from_class_name_id(class_name_id):
+    return session.query(ClassName).filter(ClassName.__id__ == class_name_id).first().name
+
+
+def dict_instances_with_student(student_id):
+    response = {
+        'instances': []
+    }
+    for __instance_member__ in session.query(InstanceMember).filter(InstanceMember.student_id == student_id).all():
+        response['instances'].append(dict_of_instance_info(__instance_member__.instance_id))
     return response
