@@ -140,7 +140,8 @@ def dict_of_instance_info(instance_id):
         'block': __instance__.block,
         'start_trimester': __instance__.start_trimester,
         'end_trimester': __instance__.end_trimester,
-        'year': __instance__.year
+        'year': __instance__.year,
+        'instance_id': __instance__.__id__
     }
     return instance_info
 
@@ -155,11 +156,11 @@ def dict_of_class_instances(class_id):
 
 
 def current_class_name_id(class_id):
-    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
+    return session.query(ClassName).filter(ClassName.class_id == class_id).filter(ClassName.active == True).first().__id__
 
 
 def current_class_name(class_id):
-    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
+    return session.query(ClassName).filter(ClassName.class_id == class_id).filter(ClassName.active == True).first().name
 
 
 def get_name_from_class_name_id(class_name_id):
@@ -173,3 +174,22 @@ def dict_instances_with_student(student_id):
     for __instance_member__ in session.query(InstanceMember).filter(InstanceMember.student_id == student_id).all():
         response['instances'].append(dict_of_instance_info(__instance_member__.instance_id))
     return response
+
+
+def dict_instance_standards(instance_id):
+    response = {
+        'standards': []
+    }
+    for __instance_standard__ in session.query(InstanceStandard).filter(InstanceStandard.instance_id == instance_id).all():
+        response['standards'].append(dict_standard_info(__instance_standard__.standard_id))
+    return response
+
+
+def dict_standard_info(standard_id):
+    __standard__ = session.query(Standard).filter(Standard.__id__ == standard_id).first()
+    standard_info = {
+        'name': __standard__.standard_name,
+        'desc': __standard__.standard_desc,
+        'standard_id': __standard__.__id__
+    }
+    return standard_info

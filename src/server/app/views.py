@@ -31,6 +31,12 @@ def class_instances(class_id):
     return jsonify(**response)
 
 
+@app_.route('/classes/instances/<int:instance_id>/standards/list')
+def instance_standards(instance_id):
+    response = database_functions.dict_instance_standards(instance_id)
+    return jsonify(**response)
+
+
 @app_.route('/student/<int:student_id>/instances')
 def student_instances(student_id):
     response = database_functions.dict_instances_with_student(student_id)
