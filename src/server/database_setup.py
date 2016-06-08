@@ -63,7 +63,7 @@ class ClassTaken(Base):
     instance_id = Column(Integer, nullable=False)  # The id of the instance
     student_id = Column(Integer, nullable=False)
 
-
+"""
 class Student(Base):
     __tablename__ = 'Student'
     __id__ = Column(Integer, primary_key=True)
@@ -72,6 +72,7 @@ class Student(Base):
     active = Column(Boolean, default=False)
     tokens = Column(Text)
     created_at = Column(DateTime, default=datetime.datetime.utcnow())
+"""
 
 
 # Table connecting the grades a student got for a standard in a class.
