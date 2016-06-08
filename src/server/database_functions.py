@@ -60,6 +60,10 @@ def current_class_name(class_id):
     return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
 
 
+def get_name_from_class_name_id(class_name_id):
+    return session.query(ClassName).filter(ClassName.__id__ == class_name_id).first().name
+
+
 def new_classname(class_id, active, name):
     session.add(ClassName(class_id=class_id, active=active, name=name))
     session.commit()
@@ -109,3 +113,26 @@ def dict_of_class_info(class_id):
         'desc': __class__.class_desc
     }
     return class_info
+
+
+def dict_of_instance_info(instance_id):
+    __instance__ = session.query(Instance).filter(Instance.__id__ == instance_id).first()
+    instance_info = {
+        'class_id': __instance__.class_id,
+        'className_id': __instance__.className_id,
+        'name': get_name_from_class_name_id(__instance__.className_id),
+        'block': __instance__.block,
+        'start_trimester': __instance__.start_trimester,
+        'end_trimester': __instance__.end_trimester,
+        'year': __instance__.year
+    }
+    return instance_info
+
+
+def dict_of_class_instances(class_id):
+    response = {
+        'instances': []
+    }
+    for __instance__ in session.query(Instance).filter(Instance.class_id == class_id).all():
+        response['instances'].append(dict_of_instance_info(__instance__.__id__))
+    return response

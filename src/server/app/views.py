@@ -13,13 +13,19 @@ def index():
     return 'Hello World!'
 
 
-@app_.route('/classes/list')
+@app_.route('/classes/all/list')
 def classes_list():
     response = database_functions.dict_of_classes()
     return jsonify(**response)
 
 
-@app_.route('/<int:class_id>/info')
+@app_.route('/classes/<int:class_id>/info')
 def class_info(class_id):
     response = database_functions.dict_of_class_info(class_id)
+    return jsonify(**response)
+
+
+@app_.route('/classes/<int:class_id>/instances')
+def class_instances(class_id):
+    response = database_functions.dict_of_class_instances(class_id)
     return jsonify(**response)
