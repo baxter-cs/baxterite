@@ -185,6 +185,15 @@ def dict_instance_standards(instance_id):
     return response
 
 
+def dict_class_standards(class_id):
+    response = {
+        'standards': []
+    }
+    for __class_standard__ in session.query(ClassStandard).filter(ClassStandard.class_id == class_id).all():
+        response['standards'].append(dict_standard_info(__class_standard__.standard_id))
+    return response
+
+
 def dict_standard_info(standard_id):
     __standard__ = session.query(Standard).filter(Standard.__id__ == standard_id).first()
     standard_info = {
