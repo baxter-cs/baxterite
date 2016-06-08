@@ -50,21 +50,18 @@ class InstanceStandard(Base):
     instance_id = Column(Integer, nullable=False)
 
 
+class ClassStandard(Base):
+    __tablename__ = 'ClassStandard'
+    __id__ = Column(Integer, primary_key=True)
+    standard_id = Column(Integer, nullable=False)
+    class_id = Column(Integer, nullable=False)
+
+
 class ClassTaken(Base):
     __tablename__ = 'ClassTaken'
     __id__ = Column(Integer, primary_key=True)
     instance_id = Column(Integer, nullable=False)  # The id of the instance
     student_id = Column(Integer, nullable=False)
-
-
-class Student(Base):
-    __tablename__ = 'Student'
-    __id__ = Column(Integer, primary_key=True)
-    student_id = Column(Integer)  # The user id obtained from google oauth
-    avatar = Column(String())
-    active = Column(Boolean, default=False)
-    tokens = Column(Text)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow())
 
 
 # Table connecting the grades a student got for a standard in a class.
@@ -74,6 +71,13 @@ class ClassStandardGrade(Base):
     student_id = Column(Integer)
     class_taken_id = Column(Integer)
     grade = Column(String())
+
+
+class InstanceMember(Base):
+    __tablename__ = 'InstanceMember'
+    __id__ = Column(Integer, primary_key=True)
+    instance_id = Column(Integer, nullable=False)
+    student_id = Column(Integer, nullable=False)
 
 
 # Create an engine that stores data in the local directory's

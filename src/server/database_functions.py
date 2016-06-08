@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Standard, Class, ClassName, Instance, InstanceStandard, ClassTaken, Student, ClassStandardGrade, Base
+from database_setup import Standard, Class, ClassName, Instance, InstanceStandard
+from database_setup import ClassTaken, InstanceMember, ClassStandardGrade, Base, ClassStandard
 
 from helper_functions import *
 
@@ -23,19 +24,21 @@ def wipe_tables():
     session.query(Instance).delete()
     session.query(InstanceStandard).delete()
     session.query(ClassTaken).delete()
-    session.query(Student).delete()
+    session.query(InstanceMember).delete()
     session.query(ClassStandardGrade).delete()
+    session.query(ClassStandard).delete()
     session.commit()
 
 
-def new_student(student_id, avatar, active, tokens):
-    session.add(Student(student_id=student_id, avatar=avatar, active=active, tokens=tokens))
-    session.commit()
+###############################
+#  Object Creation Functions  #
+###############################
 
 
 def new_standard(name, desc):
     session.add(Standard(standard_name=name, standard_desc=desc))
     session.commit()
+    return session.query(Standard).filter(Standard.standard_name == name).filter(Standard.standard_desc == desc).first().__id__
 
 
 def new_class(name, desc):
@@ -46,8 +49,108 @@ def new_class(name, desc):
     created_classname = session.query(ClassName).filter(ClassName.class_id == created_class.__id__).first()
     created_class.current_name = created_classname.__id__
     session.commit()
+    return created_class.__id__
 
 
 def new_classname(class_id, active, name):
     session.add(ClassName(class_id=class_id, active=active, name=name))
     session.commit()
+
+
+def new_instance(class_id, class_name_id, block, start_trimester, end_trimester, year):
+    session.add(Instance(class_id=class_id, className_id=class_name_id, block=block,
+                         start_trimester=start_trimester, end_trimester=end_trimester, year=year))
+    session.commit()
+    instance_id = session.query(Instance).filter(Instance.class_id == class_id).\
+        filter(Instance.className_id == class_name_id).\
+        filter(Instance.year == year).\
+        filter(Instance.block == block).\
+        filter(Instance.end_trimester == end_trimester).\
+        filter(Instance.start_trimester == start_trimester).\
+        first().__id__
+    # Inherits standards to instance
+    for standard in session.query(ClassStandard).filter(ClassStandard.class_id == class_id).all():
+        new_instance_standard(standard.__id__, instance_id)
+    return instance_id
+
+
+def new_class_standard(standard_id, class_id):
+    session.add(ClassStandard(standard_id=standard_id, class_id=class_id))
+    session.commit()
+
+
+def new_instance_standard(standard_id, instance_id):
+    session.add(InstanceStandard(standard_id=standard_id, instance_id=instance_id))
+    session.commit()
+
+
+def new_instance_member(instance_id, student_id):
+    session.add(InstanceMember(instance_id=instance_id, student_id=student_id))
+    session.commit()
+
+
+###############################
+#  Get Information Functions  #
+###############################
+
+def dict_of_classes():
+    response = {
+        'classes': []
+    }
+    for __class__ in session.query(Class).all():
+        response['classes'].append(dict_of_class_info(__class__.__id__))
+    return response
+
+
+def dict_of_class_info(class_id):
+    __class__ = session.query(Class).filter(Class.__id__ == class_id).first()
+    class_info = {
+        'name': current_class_name(class_id),
+        'id': class_id,
+        'desc': __class__.class_desc
+    }
+    return class_info
+
+
+def dict_of_instance_info(instance_id):
+    __instance__ = session.query(Instance).filter(Instance.__id__ == instance_id).first()
+    instance_info = {
+        'class_id': __instance__.class_id,
+        'className_id': __instance__.className_id,
+        'name': get_name_from_class_name_id(__instance__.className_id),
+        'block': __instance__.block,
+        'start_trimester': __instance__.start_trimester,
+        'end_trimester': __instance__.end_trimester,
+        'year': __instance__.year
+    }
+    return instance_info
+
+
+def dict_of_class_instances(class_id):
+    response = {
+        'instances': []
+    }
+    for __instance__ in session.query(Instance).filter(Instance.class_id == class_id).all():
+        response['instances'].append(dict_of_instance_info(__instance__.__id__))
+    return response
+
+
+def current_class_name_id(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().__id__
+
+
+def current_class_name(class_id):
+    return session.query(ClassName).filter(ClassName.class_id == class_id and ClassName.active == True).first().name
+
+
+def get_name_from_class_name_id(class_name_id):
+    return session.query(ClassName).filter(ClassName.__id__ == class_name_id).first().name
+
+
+def dict_instances_with_student(student_id):
+    response = {
+        'instances': []
+    }
+    for __instance_member__ in session.query(InstanceMember).filter(InstanceMember.student_id == student_id).all():
+        response['instances'].append(dict_of_instance_info(__instance_member__.instance_id))
+    return response
