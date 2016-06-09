@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Standard, Class, ClassName, Instance, InstanceStandard
 from database_setup import ClassTaken, InstanceMember, InstanceStandardGrade, Base, ClassStandard
 
-from helper_functions import *
+import helper_functions
 
 import uuid, time
 
@@ -100,10 +100,9 @@ def new_instance_member(instance_id, student_id):
     session.commit()
 
 
-def instance_standard_grade(student_id, standard_id, instance_id, grade):
+def new_instance_standard_grade(student_id, instance_standard_id, grade):
     session.add(InstanceStandardGrade(student_id=student_id,
-                                      standard_id=standard_id,
-                                      instance_id=instance_id,
+                                      instance_standard_id=instance_standard_id,
                                       grade=grade))
     session.commit()
 
@@ -202,3 +201,53 @@ def dict_standard_info(standard_id):
         'standard_id': __standard__.__id__
     }
     return standard_info
+
+
+def dict_instances_grades(student_id):
+    response = {
+        'standards': []
+    }
+    for __InstanceStandardGrade__ in session.query(InstanceStandardGrade).\
+            filter(InstanceStandardGrade.student_id == student_id).all():
+
+        response['standards'].append(dict_instance_standard_info(__InstanceStandardGrade__.instance_standard_id,
+                                                                 __InstanceStandardGrade__.student_id,
+                                                                 __InstanceStandardGrade__.grade))
+    return response
+
+
+def dict_instance_grades(student_id, instance_id):
+    response = {
+        'standards': []
+    }
+    for __InstanceStandardGrade__ in session.query(InstanceStandardGrade).\
+                filter(InstanceStandardGrade.student_id == student_id).\
+                filter(InstanceStandardGrade.instance_id == instance_id).all():
+
+        response['standards'].append(dict_instance_standard_info(__InstanceStandardGrade__.standard_id,
+                                                                 __InstanceStandardGrade__.student_id,
+                                                                 __InstanceStandardGrade__.grade))
+    return response
+
+
+def dict_instance_standard_info(instance_standard_id, student_id=False, grade=False):
+    __instance_standard__ = session.query(InstanceStandard).filter(InstanceStandard.__id__ == instance_standard_id).first()
+    __standard__ = session.query(Standard).filter(Standard.__id__ == __instance_standard__.standard_id).first()
+    instance_standard_info = {
+        'name': __standard__.standard_name,
+        'desc': __standard__.standard_desc,
+        'standard_id': __standard__.__id__,
+        'instance_standard_id': instance_standard_id
+    }
+    if student_id is not False and grade is not False:
+        instance_standard_info['raw_grade'] = grade
+        instance_standard_info['grade'] = helper_functions.convert_grade(grade)
+        instance_standard_info['student_id'] = student_id
+    return instance_standard_info
+
+
+def get_instance_standard_id(instance_id, standard_id):
+    return session.query(InstanceStandard).filter(InstanceStandard.standard_id == standard_id).\
+        filter(InstanceStandard.instance_id == instance_id).\
+        first().\
+        __id__

@@ -69,8 +69,8 @@ class InstanceStandardGrade(Base):
     __tablename__ = 'InstanceStandardGrade'
     __id__ = Column(Integer, primary_key=True)
     student_id = Column(Integer, nullable=False)
-    standard_id = Column(Integer, nullable=False)
-    instance_id = Column(Integer, nullable=False)
+    instance_standard_id = Column(Integer, nullable=False)
+    #instance_id = Column(Integer, nullable=False)
     grade = Column(String())
 
 

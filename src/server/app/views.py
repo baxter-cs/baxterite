@@ -47,3 +47,15 @@ def instance_standards(instance_id):
 def student_instances(student_id):
     response = database_functions.dict_instances_with_student(student_id)
     return jsonify(**response)
+
+
+@app_.route('/student/<int:student_id>/instances/all/grade')
+def student_instance_grades(student_id):
+    response = database_functions.dict_instances_grades(student_id)
+    return jsonify(**response)
+
+
+@app_.route('/student/<int:student_id>/instances/<int:instance_id>/grade')
+def student_instance_grade(student_id, instance_id):
+    response = database_functions.dict_instance_grades(student_id, instance_id)
+    return jsonify(**response)
